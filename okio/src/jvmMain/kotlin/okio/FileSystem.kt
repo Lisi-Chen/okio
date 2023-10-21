@@ -61,11 +61,14 @@ actual abstract class FileSystem {
   @Throws(IOException::class)
   actual abstract fun source(file: Path): Source
 
+
   @Throws(IOException::class)
   @JvmName("-read")
   actual inline fun <T> read(file: Path, readerAction: BufferedSource.() -> T): T {
-    return source(file).buffer().use {
-      it.readerAction()
+    return source(file).buffer().use { bufferedSource ->
+      val result = bufferedSource.readerAction()
+      bufferedSource.close()
+      result
     }
   }
 
